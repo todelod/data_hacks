@@ -24,6 +24,7 @@ import math
 from collections import defaultdict
 from optparse import OptionParser
 
+
 def load_stream(input_stream):
     for line in input_stream:
         clean_line = line.strip()
@@ -35,35 +36,36 @@ def load_stream(input_stream):
         if clean_line:
             yield clean_line
 
+
 def run(input_stream, options):
-    data = defaultdict(lambda:0)
+    data = defaultdict(lambda: 0)
     for row in input_stream:
-        data[row]+=1
-    
+        data[row] += 1
+
     if not data:
         print "Error: no data"
         sys.exit(1)
-    
+
     max_length = max([len(key) for key in data.keys()])
     max_length = min(max_length, 50)
     value_characters = 80 - max_length
     max_value = max(data.values())
     scale = int(math.ceil(float(max_value) / value_characters))
     scale = max(1, scale)
-    
+
     print "# each * represents a count of %d" % scale
-    
+
     if options.sort_values:
         # sort by values
-        data = [[value,key] for key,value in data.items()]
+        data = [[value, key] for key, value in data.items()]
         if options.reverse_sort:
             data.sort(reverse=True)
         else:
             data.sort()
     else:
-        data = [[key,value] for key,value in data.items()]
+        data = [[key, value] for key, value in data.items()]
         data.sort(reverse=options.reverse_sort)
-        data = [[value, key] for key,value in data]
+        data = [[value, key] for key, value in data]
 
     format = "%d %" + str(max_length) + "s [%6d] %s"
     for i, (value, key) in enumerate(data):
@@ -74,14 +76,14 @@ if __name__ == "__main__":
     parser = OptionParser()
     parser.usage = "cat data | %prog [options]"
     parser.add_option("-k", "--sort-keys", dest="sort_keys", default=True, action="store_true",
-                        help="sort by the key [default]")
+                      help="sort by the key [default]")
     parser.add_option("-v", "--sort-values", dest="sort_values", default=False, action="store_true",
-                        help="sort by the frequency")
+                      help="sort by the frequency")
     parser.add_option("-r", "--reverse-sort", dest="reverse_sort", default=False, action="store_true",
-                        help="reverse the sort")
-    
+                      help="reverse the sort")
+
     (options, args) = parser.parse_args()
-    
+
     if sys.stdin.isatty():
         parser.print_usage()
         print "for more help use --help"

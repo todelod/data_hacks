@@ -25,18 +25,20 @@ import random
 from optparse import OptionParser
 from decimal import Decimal
 
+
 def run(sample_rate):
     input_stream = sys.stdin
     for line in input_stream:
-        if random.randint(1,100) <= sample_rate:
+        if random.randint(1, 100) <= sample_rate:
             sys.stdout.write(line)
+
 
 def get_sample_rate(rate_string):
     """ return a rate as a percentage"""
     if rate_string.endswith("%"):
         rate = int(rate_string[:-1])
     elif '/' in rate_string:
-        x, y  = rate_string.split('/')
+        x, y = rate_string.split('/')
         rate = Decimal(x) / (Decimal(y) * Decimal('1.0'))
         rate = int(rate * 100)
     else:
@@ -45,21 +47,22 @@ def get_sample_rate(rate_string):
         raise ValueError('rate %r must be 1%% <= rate <= 100%% ' % rate_string)
     return rate
 
+
 if __name__ == "__main__":
     parser = OptionParser(usage="cat data | %prog [options] [sample_rate]")
     parser.add_option("--verbose", dest="verbose", default=False, action="store_true")
     (options, args) = parser.parse_args()
-    
+
     if not args or sys.stdin.isatty():
         parser.print_usage()
         sys.exit(1)
-    
+
     try:
         sample_rate = get_sample_rate(sys.argv[-1])
     except ValueError, e:
-        print >>sys.stderr, e
+        print >> sys.stderr, e
         parser.print_usage()
         sys.exit(1)
     if options.verbose:
-        print >>sys.stderr, "Sample rate is %d%%" % sample_rate 
+        print >> sys.stderr, "Sample rate is %d%%" % sample_rate
     run(sample_rate)

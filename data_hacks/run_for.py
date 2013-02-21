@@ -24,6 +24,7 @@ import time
 import sys
 import os
 
+
 def getruntime(arg):
     if not arg:
         return
@@ -38,7 +39,8 @@ def getruntime(arg):
     elif suffix == "d":
         return base * 60 * 60 * 24
     else:
-        print >>sys.stderr, "invalid time suffix %r. must be one of s,m,h,d" % arg
+        print >> sys.stderr, "invalid time suffix %r. must be one of s,m,h,d" % arg
+
 
 def run(runtime):
     end = time.time() + runtime
@@ -46,6 +48,7 @@ def run(runtime):
         sys.stdout.write(line)
         if time.time() > end:
             return
+
 
 if __name__ == "__main__":
     usage = "Usage: tail -f access.log | %s [time] | ..." % os.path.basename(sys.argv[0])

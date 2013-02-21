@@ -28,14 +28,16 @@ from decimal import Decimal
 import math
 from optparse import OptionParser
 
+
 class MVSD(object):
     """ A class that calculates a running Mean / Variance / Standard Deviation"""
+
     def __init__(self):
         self.is_started = False
         self.ss = Decimal(0) # (running) sum of square deviations from mean
         self.m = Decimal(0) # (running) mean
         self.total_w = Decimal(0) # weight of items seen
-        
+
     def add(self, x, w=1):
         """ add another datapoint to the Mean / Variance / Standard Deviation"""
         if not isinstance(x, Decimal):
@@ -48,28 +50,30 @@ class MVSD(object):
         else:
             temp_w = self.total_w + w
             self.ss += (self.total_w * w * (x - self.m) * (x - self.m )) / temp_w
-            self.m += (x - self.m) / temp_w 
+            self.m += (x - self.m) / temp_w
             self.total_w = temp_w
-        
-        # print "added %-2d mean=%0.2f var=%0.2f std=%0.2f" % (x, self.mean(), self.var(), self.sd())
-        
+
+            # print "added %-2d mean=%0.2f var=%0.2f std=%0.2f" % (x, self.mean(), self.var(), self.sd())
+
     def var(self):
         return self.ss / self.total_w
-    
+
     def sd(self):
         return math.sqrt(self.var())
-    
+
     def mean(self):
         return self.m
+
 
 def test_mvsd():
     mvsd = MVSD()
     for x in range(10):
         mvsd.add(x)
-    
+
     assert '%.2f' % mvsd.mean() == "4.50"
     assert '%.2f' % mvsd.var() == "8.25"
     assert '%.14f' % mvsd.sd() == "2.87228132326901"
+
 
 def load_stream(input_stream):
     for line in input_stream:
@@ -82,22 +86,24 @@ def load_stream(input_stream):
         try:
             yield Decimal(clean_line)
         except:
-            print >>sys.stderr, "invalid line %r" % line
+            print >> sys.stderr, "invalid line %r" % line
+
 
 def median(values):
     length = len(values)
-    if length%2:
-        median_indeces = [length/2]
+    if length % 2:
+        median_indeces = [length / 2]
     else:
-        median_indeces = [length/2-1, length/2]
+        median_indeces = [length / 2 - 1, length / 2]
 
     values = sorted(values)
     return sum([values[i] for i in median_indeces]) / len(median_indeces)
 
+
 def test_median():
-    assert 6 == median([8,7,9,1,2,6,3]) # odd-sized list
-    assert 4 == median([4,5,2,1,9,10]) # even-sized int list. (4+5)/2 = 4
-    assert "4.50" == "%.2f" % median([4.0,5,2,1,9,10]) #even-sized float list. (4.0+5)/2 = 4.5
+    assert 6 == median([8, 7, 9, 1, 2, 6, 3]) # odd-sized list
+    assert 4 == median([4, 5, 2, 1, 9, 10]) # even-sized int list. (4+5)/2 = 4
+    assert "4.50" == "%.2f" % median([4.0, 5, 2, 1, 9, 10]) #even-sized float list. (4.0+5)/2 = 4.5
 
 
 def histogram(stream, options):
@@ -112,7 +118,7 @@ def histogram(stream, options):
     else:
         data = stream
     bucket_scale = 1
-    
+
     if options.min:
         min_v = Decimal(options.min)
     else:
@@ -126,41 +132,42 @@ def histogram(stream, options):
         raise ValueError('# of buckets must be > 0')
     if not max_v > min_v:
         raise ValueError('max must be > min. max:%s min:%s' % (max_v, min_v))
-        
+
     diff = max_v - min_v
     step = diff / buckets
     bucket_counts = [0 for x in range(buckets)]
     boundaries = []
     for x in range(buckets):
         boundaries.append(min_v + (step * (x + 1)))
-    
+
     skipped = 0
     samples = 0
     mvsd = MVSD()
     accepted_data = []
     for value in data:
-        samples +=1
+        samples += 1
         if options.mvsd:
             mvsd.add(value)
             accepted_data.append(value)
-        # find the bucket this goes in
+            # find the bucket this goes in
         if value < min_v or value > max_v:
-            skipped +=1
+            skipped += 1
             continue
         for bucket_postion, boundary in enumerate(boundaries):
             if value <= boundary:
-                bucket_counts[bucket_postion] +=1
+                bucket_counts[bucket_postion] += 1
                 break
-    
+
     # auto-pick the hash scale
     if max(bucket_counts) > 75:
         bucket_scale = int(max(bucket_counts) / 75)
-    
+
     print "# NumSamples = %d; Min = %0.2f; Max = %0.2f" % (samples, min_v, max_v)
     if skipped:
         print "# %d value%s outside of min/max" % (skipped, skipped > 1 and 's' or '')
     if options.mvsd:
-        print "# Mean = %f; Variance = %f; SD = %f; Median %f" % (mvsd.mean(), mvsd.var(), mvsd.sd(), median(accepted_data))
+        print "# Mean = %f; Variance = %f; SD = %f; Median %f" % (
+        mvsd.mean(), mvsd.var(), mvsd.sd(), median(accepted_data))
     print "# each * represents a count of %d" % bucket_scale
     bucket_min = min_v
     bucket_max = min_v
@@ -172,19 +179,19 @@ def histogram(stream, options):
         if bucket_count:
             star_count = bucket_count / bucket_scale
         print '%10.4f - %10.4f [%6d]: %s' % (bucket_min, bucket_max, bucket_count, '*' * star_count)
-        
+
 
 if __name__ == "__main__":
     parser = OptionParser()
     parser.usage = "cat data | %prog [options]"
     parser.add_option("-m", "--min", dest="min",
-                        help="minimum value for graph")
+                      help="minimum value for graph")
     parser.add_option("-x", "--max", dest="max",
-                        help="maximum value for graph")
+                      help="maximum value for graph")
     parser.add_option("-b", "--buckets", dest="buckets",
-                        help="Number of buckets to use for the histogram")
+                      help="Number of buckets to use for the histogram")
     parser.add_option("--no-mvsd", dest="mvsd", action="store_false", default=True,
-                        help="Dissable the calculation of Mean, Vairance and SD. (improves performance)")
+                      help="Dissable the calculation of Mean, Vairance and SD. (improves performance)")
 
     (options, args) = parser.parse_args()
     if sys.stdin.isatty():
