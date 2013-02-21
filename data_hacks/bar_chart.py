@@ -64,9 +64,11 @@ def run(input_stream, options):
         data = [[key,value] for key,value in data.items()]
         data.sort(reverse=options.reverse_sort)
         data = [[value, key] for key,value in data]
-    format = "%" + str(max_length) + "s [%6d] %s"
-    for value,key in data:
-        print format % (key[:max_length], value, (value / scale) * "*")
+
+    format = "%d %" + str(max_length) + "s [%6d] %s"
+    for i, (value, key) in enumerate(data):
+        print format % (i + 1, key[:max_length], value, (value / scale) * "*")
+
 
 if __name__ == "__main__":
     parser = OptionParser()
