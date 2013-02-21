@@ -76,7 +76,7 @@ if __name__ == "__main__":
     parser.add_option("-k", "--sort-keys", dest="sort_keys", default=True, action="store_true",
                         help="sort by the key [default]")
     parser.add_option("-v", "--sort-values", dest="sort_values", default=False, action="store_true",
-                        help="sort by the frequence")
+                        help="sort by the frequency")
     parser.add_option("-r", "--reverse-sort", dest="reverse_sort", default=False, action="store_true",
                         help="reverse the sort")
     
