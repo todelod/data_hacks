@@ -67,7 +67,7 @@ def run(input_stream, options):
         data.sort(reverse=options.reverse_sort)
         data = [[value, key] for key, value in data]
 
-    format = "%4d | %" + str(max_length) + "s [%6d] %s"
+    format = "%" + str(len(str(len(data)))) + "d | %" + str(max_length) + "s [%6d] %s"
     for i, (value, key) in enumerate(data):
         print format % (i + 1, key[:max_length], value, (value / scale) * "*")
 
