@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from distutils.core import setup
+import py2exe
 
 version = "0.2"
 setup(name='data_hacks',
@@ -21,4 +22,5 @@ setup(name='data_hacks',
                 'data_hacks/run_for.py',
                 'data_hacks/bar_chart.py',
                 'data_hacks/sample.py'],
+      console=['bar_chart.py', 'histogram.py', 'ninety_five_percent.py']
      )
