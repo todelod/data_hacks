@@ -22,5 +22,5 @@ setup(name='data_hacks',
                 'data_hacks/run_for.py',
                 'data_hacks/bar_chart.py',
                 'data_hacks/sample.py'],
-      console=['bar_chart.py', 'histogram.py', 'ninety_five_percent.py']
+      console=['data_hacks/bar_chart.py', 'data_hacks/histogram.py', 'data_hacks/ninety_five_percent.py']
      )
